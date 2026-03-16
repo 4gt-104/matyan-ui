@@ -1,0 +1,35 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tox/
+.nox/
+*.egg-info/
+.eggs/
+build/
+dist/
+.coverage
+htmlcov/
+
+# Version control and IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Node (largest build-context savings)
+web/node_modules/
+node_modules/
+web/.cache/
+web/build/
+.npm/
+
+# Docs and env (not needed in image)
+*.md
+.env
+.env.*
+.python-version

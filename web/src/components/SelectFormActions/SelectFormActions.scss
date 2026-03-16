@@ -1,0 +1,14 @@
+@use 'src/styles/abstracts' as *;
+
+.SelectFormActions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-bottom: $border-main;
+
+  button {
+    padding: 0.125rem 0.375rem;
+    min-height: unset;
+  }
+}
