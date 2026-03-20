@@ -1,11 +1,11 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 requires-python = ">=3.12, <4"
 name = "matyan-ui"
-version = "0.2.0"
+dynamic = ["version"]
 description = "Matyan web UI server — serves the React app and static assets"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -38,6 +38,9 @@ Documentation = "https://4gt-104.github.io/matyan-core/"
 
 [project.scripts]
 matyan-ui = "matyan_ui:exec_"
+
+[tool.setuptools_scm]
+fallback_version = "0.2.0"
 
 [tool.setuptools.package-data]
 "matyan_ui" = ["static/**/*"] # Include static files in the package
