@@ -25,7 +25,7 @@ function GroupedBox(props: any) {
         height: boxSize.height,
       },
     }));
-  }, [props.viz.data]);
+  }, [props.viz.data, boxSize.width, boxSize.height]);
 
   let container: React.MutableRefObject<HTMLDivElement> =
     React.useRef<HTMLDivElement>(document.createElement('div'));

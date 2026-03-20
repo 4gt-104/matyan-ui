@@ -52,7 +52,7 @@ function App(): React.FunctionComponentElement<React.ReactNode> {
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, []);
+  }, [loadPyodide]);
 
   return (
     <BrowserRouter basename={basePath}>

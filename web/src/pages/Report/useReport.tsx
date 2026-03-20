@@ -45,6 +45,7 @@ function useReport() {
     return () => {
       // reportAppModel.destroy();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.reportId]);
 
   React.useEffect(() => {

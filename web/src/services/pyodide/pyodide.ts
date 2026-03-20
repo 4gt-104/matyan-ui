@@ -76,11 +76,13 @@ export async function loadPyodideInstance() {
           terminal.innerHTML! += `<p>${args.join(', ')}</p>`;
           terminal.scrollTop = terminal.scrollHeight;
         } else {
+          // eslint-disable-next-line no-console
           console.log(...args);
         }
       });
     },
     stderr: (...args: any[]) => {
+      // eslint-disable-next-line no-console
       console.log(...args);
     },
   });

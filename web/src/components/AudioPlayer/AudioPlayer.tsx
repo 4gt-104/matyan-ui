@@ -22,7 +22,7 @@ import { getFormattedTime, populateDispatch } from './state/helpers';
 import PLAYER from './state/player';
 import reducer from './state/reducer';
 
-const isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
+const isSafari = !!navigator.userAgent.match(/Version\/[\d.]+.*Safari/);
 
 const initialState = {
   player: {
@@ -120,6 +120,12 @@ export interface IAudioPlayerColors {
   hover: string;
 }
 
+export enum AudioPlayerVariation {
+  primary = 'primary',
+  secondary = 'secondary',
+  default = 'default',
+}
+
 export const getColors = (
   theme,
   variation: keyof typeof AudioPlayerVariation,
@@ -140,12 +146,6 @@ export const getColors = (
     };
   }
 };
-
-export enum AudioPlayerVariation {
-  primary = 'primary',
-  secondary = 'secondary',
-  default = 'default',
-}
 
 enum AudioPlayerPreload {
   auto = 'auto',
@@ -236,7 +236,7 @@ const AudioPlayer: React.FunctionComponent<IAudioPlayerProps> = ({
   const handleClose = React.useCallback(() => {
     setVisibility(false);
     onClose();
-  }, []);
+  }, [onClose]);
   const theme: { [key: string]: any } = useTheme();
   const playerColors: IAudioPlayerColors = getColors(theme, variation);
   const componentsOrder =
@@ -273,7 +273,7 @@ const AudioPlayer: React.FunctionComponent<IAudioPlayerProps> = ({
     _loopAudio,
   ] = React.useMemo(() => {
     return populateDispatch(dispatch, player, ...actionCreators);
-  }, [dispatch, player, actionCreators]);
+  }, [dispatch, player]);
   const handleAudioSliderChange = (event: object, progress: any) => {
     _changePlayerSlider(progress);
   };
@@ -317,19 +317,17 @@ const AudioPlayer: React.FunctionComponent<IAudioPlayerProps> = ({
       player.current.addEventListener('pause', onPaused);
       player.current.addEventListener('play', onPlayed);
     }
+    const currentPlayer = player.current;
     return () => {
-      if (player && player.current) {
-        player.current.removeEventListener('canplay', onLoad);
-
-        player.current.removeEventListener(
-          'timeupdate',
-          handlePlayerTimeUpdate,
-        );
-        player.current.removeEventListener('ended', handleAudioEnd);
-        player.current.removeEventListener('pause', onPaused);
-        player.current.removeEventListener('play', onPlayed);
+      if (currentPlayer) {
+        currentPlayer.removeEventListener('canplay', onLoad);
+        currentPlayer.removeEventListener('timeupdate', handlePlayerTimeUpdate);
+        currentPlayer.removeEventListener('ended', handleAudioEnd);
+        currentPlayer.removeEventListener('pause', onPaused);
+        currentPlayer.removeEventListener('play', onPlayed);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player, src]);
 
   React.useEffect(() => {
@@ -340,12 +338,13 @@ const AudioPlayer: React.FunctionComponent<IAudioPlayerProps> = ({
         _unmuteAudio();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [muted]);
 
   if (debug) {
-    // tslint:disable-next-line
+    // eslint-disable-next-line no-console
     console.log('state', state);
-    // tslint:disable-next-line
+    // eslint-disable-next-line no-console
     console.log('player', player);
   }
 

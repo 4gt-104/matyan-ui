@@ -19,6 +19,7 @@ import Plotly from './Plotly';
 
 export const dataVizElementsMap: any = {
   LineChart: (props: any) => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const onActivePointChange = React.useCallback(
       _.debounce(props.callbacks?.on_active_point_change, 100),
       [],
@@ -54,7 +55,7 @@ export const dataVizElementsMap: any = {
           onActivePointChange(activePoint, false);
         }
       },
-      [],
+      [onActivePointChange],
     );
 
     return (
@@ -131,6 +132,7 @@ export const dataVizElementsMap: any = {
     </div>
   ),
   Slider: (props: any) => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const onChange = React.useCallback(
       _.debounce(props.callbacks?.on_change, 100),
       [],
@@ -146,15 +148,21 @@ export const dataVizElementsMap: any = {
     );
   },
   TextInput: (props: any) => {
-    const onChange = React.useCallback(({ target }) => {
-      props.callbacks?.on_change(target.value);
-    }, []);
+    const onChange = React.useCallback(
+      ({ target }) => {
+        props.callbacks?.on_change(target.value);
+      },
+      [props.callbacks],
+    );
     return <Input value={props.options.value} onChange={onChange} />;
   },
   Button: (props: any) => {
-    const onClick = React.useCallback((e) => {
-      props.callbacks?.on_click(e);
-    }, []);
+    const onClick = React.useCallback(
+      (e) => {
+        props.callbacks?.on_click(e);
+      },
+      [props.callbacks],
+    );
     return (
       <Button {...props.options} onClick={onClick}>
         {props.options.label}
@@ -171,10 +179,13 @@ export const dataVizElementsMap: any = {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.data]);
 
-    const onChange = React.useCallback((checked) => {
-      setChecked(checked);
-      props.callbacks?.on_change(checked);
-    }, []);
+    const onChange = React.useCallback(
+      (checked) => {
+        setChecked(checked);
+        props.callbacks?.on_change(checked);
+      },
+      [props.callbacks],
+    );
 
     return (
       <Switch {...props.options} checked={checked} onCheckedChange={onChange} />

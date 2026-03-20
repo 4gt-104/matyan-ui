@@ -18,6 +18,7 @@ function useReports() {
       getReportsData();
     }
     analytics.pageView(ANALYTICS_EVENT_KEYS.reports.pageView);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [searchValue, setSearchValue] = React.useState<string>('');

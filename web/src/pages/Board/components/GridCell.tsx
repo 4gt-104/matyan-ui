@@ -25,7 +25,7 @@ function GridCell(props: any) {
 
   React.useEffect(() => {
     setStackValue(sliderValues[0]);
-  }, [stackMap]);
+  }, [stackMap, sliderValues]);
 
   return props.viz.no_facet !== false ? (
     <>

@@ -117,6 +117,7 @@ function ImagesList(props: any) {
         subscriptions.forEach((sub: any) => sub.unsubscribe);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

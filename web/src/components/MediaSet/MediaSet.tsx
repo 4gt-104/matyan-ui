@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash-es';
 import { VariableSizeList as List, areEqual } from 'react-window';
 import classNames from 'classnames';
 
@@ -171,7 +170,7 @@ const MediaSet = ({
       content,
       addUriToList,
       wrapperOffsetWidth,
-      wrapperOffsetHeight,
+      effectiveWrapperOffsetHeight,
       index,
       mediaSetKey,
       mediaItemHeight,

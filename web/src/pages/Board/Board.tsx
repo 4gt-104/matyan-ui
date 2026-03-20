@@ -157,13 +157,13 @@ board_id=${boardId === undefined ? 'None' : `"${boardId}"`}
     if (state.stateUpdateCount > 0) {
       runParsedCode();
     }
-  }, [state.stateUpdateCount]);
+  }, [state.stateUpdateCount, runParsedCode]);
 
   React.useEffect(() => {
     if (state.executionCount > 0) {
       runParsedCode();
     }
-  }, [state.executionCount]);
+  }, [state.executionCount, runParsedCode]);
 
   React.useEffect(() => {
     if (pyodideIsLoading) {
@@ -196,6 +196,7 @@ board_id=${boardId === undefined ? 'None' : `"${boardId}"`}
       },
     );
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       window.clearTimeout(timerId.current);
       unsubscribe(null);
     };
