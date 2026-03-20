@@ -22,6 +22,11 @@ export interface IMediaListProps {
   mediaType: MediaTypeEnum;
   selectOptions: IGroupingSelectOption[];
   onRunsTagsChange: (runHash: string, tags: ITagInfo[]) => void;
+  listLayout?: 'horizontal' | 'vertical';
+  columnWidth?: number;
+  /** Override the container height for the vertical list. When set, the List uses
+   * this height instead of wrapperOffsetHeight, so per-column scroll is avoided. */
+  listHeightOverride?: number;
 }
 
 export interface IImageBoxProps {

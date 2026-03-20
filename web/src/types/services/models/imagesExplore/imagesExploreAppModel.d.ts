@@ -49,6 +49,7 @@ export interface IImagesExploreAppConfig {
     sortFields?: SortFields;
     sortFieldsDict: any;
     inputsValidations: any;
+    listLayout?: 'rows' | 'columns';
   };
   select: ISelectConfig;
   table: {

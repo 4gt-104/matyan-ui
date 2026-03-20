@@ -12,6 +12,8 @@ export const ITEM_CAPTION_HEIGHT = 40;
 export const MEDIA_SET_TITLE_HEIGHT = 17;
 export const MEDIA_SET_WRAPPER_PADDING_HEIGHT = 6;
 export const MEDIA_SET_SLIDER_HEIGHT = 20;
+/** Fixed width of each column when listLayout is 'columns' (vertical strips side-by-side). */
+export const MEDIA_SET_COLUMN_WIDTH = 220;
 export const BATCH_COLLECT_DELAY = 200;
 export const BATCH_SEND_DELAY = 300;
 export const IMAGE_SIZE_CHANGE_DELAY = 200;

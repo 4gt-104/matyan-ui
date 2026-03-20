@@ -19,6 +19,8 @@ export interface IControlProps {
     value: { value: string; label: string } | null,
   ) => void;
   onStackingToggle: () => void;
+  listLayout?: 'rows' | 'columns';
+  onListLayoutToggle: () => void;
   onImagesSortReset: () => void;
   onImagesSortChange: any;
   sortFields: SortField[];

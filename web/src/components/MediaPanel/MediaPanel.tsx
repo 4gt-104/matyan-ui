@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash-es';
+import classNames from 'classnames';
 
 import MediaSet from 'components/MediaSet/MediaSet';
 import BusyLoaderWrapper from 'components/BusyLoaderWrapper/BusyLoaderWrapper';
@@ -45,6 +46,7 @@ function MediaPanel({
   onChangeTooltip = () => {},
   selectOptions = [],
   onRunsTagsChange = () => {},
+  listLayout = 'rows',
 }: IMediaPanelProps): React.FunctionComponentElement<React.ReactNode> {
   const [activePointRect, setActivePointRect] = React.useState<{
     top: number;
@@ -286,7 +288,10 @@ function MediaPanel({
                 >
                   <div
                     ref={containerRef}
-                    className='MediaPanel__mediaSetContainer'
+                    className={classNames('MediaPanel__mediaSetContainer', {
+                      'MediaPanel__mediaSetContainer--columns':
+                        listLayout === 'columns',
+                    })}
                     onMouseOver={onMouseOver}
                   >
                     <ErrorBoundary>
@@ -307,6 +312,7 @@ function MediaPanel({
                         sortFields={sortFields}
                         selectOptions={selectOptions}
                         onRunsTagsChange={onRunsTagsChange}
+                        listLayout={listLayout}
                       />
                     </ErrorBoundary>
                   </div>

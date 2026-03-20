@@ -6,6 +6,7 @@ import AudioBox from 'components/kit/AudioBox';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
 import {
+  ITEM_CAPTION_HEIGHT,
   MEDIA_ITEMS_SIZES,
   MEDIA_LIST_HEIGHT,
 } from 'config/mediaConfigs/mediaConfigs';
@@ -32,19 +33,31 @@ function MediaList({
   wrapperOffsetHeight,
   selectOptions,
   onRunsTagsChange,
+  listLayout = 'horizontal',
+  columnWidth,
+  listHeightOverride,
 }: IMediaListProps): React.FunctionComponentElement<React.ReactNode> {
+  const effectiveWidth =
+    listLayout === 'vertical' && columnWidth != null
+      ? columnWidth
+      : wrapperOffsetWidth;
+
   const itemSize = React.useCallback(
     (index: number) => {
       if (mediaType === MediaTypeEnum.AUDIO) {
-        return MEDIA_ITEMS_SIZES[mediaType]().width;
+        const size = MEDIA_ITEMS_SIZES[mediaType]();
+        return listLayout === 'vertical' ? size.height : size.width;
       } else {
-        return MEDIA_ITEMS_SIZES[mediaType]({
+        const size = MEDIA_ITEMS_SIZES[mediaType]({
           data,
           index,
           additionalProperties,
-          wrapperOffsetWidth,
+          wrapperOffsetWidth: effectiveWidth,
           wrapperOffsetHeight,
-        }).width;
+        });
+        return listLayout === 'vertical'
+          ? size.height + ITEM_CAPTION_HEIGHT
+          : size.width;
       }
     },
     [
@@ -52,11 +65,15 @@ function MediaList({
       data,
       mediaType,
       wrapperOffsetHeight,
-      wrapperOffsetWidth,
+      effectiveWidth,
+      listLayout,
     ],
   );
 
   const listHeight = React.useMemo(() => {
+    if (listLayout === 'vertical') {
+      return listHeightOverride ?? wrapperOffsetHeight;
+    }
     const { maxWidth, maxHeight } = getBiggestImageFromList(data);
     const { alignmentType, mediaItemSize } = additionalProperties;
     if (mediaType === MediaTypeEnum.IMAGE) {
@@ -77,7 +94,15 @@ function MediaList({
     mediaItemHeight,
     mediaType,
     wrapperOffsetWidth,
+    wrapperOffsetHeight,
+    listLayout,
+    listHeightOverride,
   ]);
+
+  const listWidth =
+    listLayout === 'vertical' ? effectiveWidth : wrapperOffsetWidth;
+  const mediaItemHeightForItems =
+    listLayout === 'horizontal' ? listHeight : undefined;
 
   return (
     <ErrorBoundary>
@@ -85,13 +110,13 @@ function MediaList({
         height={listHeight}
         itemCount={data.length}
         itemSize={itemSize}
-        layout='horizontal'
-        width={wrapperOffsetWidth}
+        layout={listLayout}
+        width={listWidth}
         style={{ overflowY: 'hidden' }}
         itemData={{
           data,
           addUriToList,
-          mediaItemHeight: listHeight,
+          mediaItemHeight: mediaItemHeightForItems ?? mediaItemHeight,
           focusedState,
           additionalProperties,
           tooltip,

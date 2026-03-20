@@ -86,7 +86,7 @@ export async function loadPyodideInstance() {
   });
 
   const namespace = pyodide.toPy({});
-  const mock = await fetch(`${getBasePath()}/static-files/matyan_ui_core.py`);
+  const mock = await fetch(`${getBasePath()}/static-files/matyan_ui_core.py/`);
   const mockText = await mock.text();
 
   await pyodide.runPythonAsync(mockText, { globals: namespace });

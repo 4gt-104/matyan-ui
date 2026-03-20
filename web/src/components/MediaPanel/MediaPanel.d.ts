@@ -42,4 +42,5 @@ export interface IMediaPanelProps {
   illustrationConfig?: IIllustrationConfig;
   onRunsTagsChange?: (runHash: string, tags: ITagInfo[]) => void;
   onChangeTooltip?: (tooltip: ITooltip) => void;
+  listLayout?: 'rows' | 'columns';
 }

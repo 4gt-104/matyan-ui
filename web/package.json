@@ -73,7 +73,7 @@
   },
   "scripts": {
     "start": "react-app-rewired --max_old_space_size=4096 start",
-    "build": "rm -rf ../src/matyan_ui/static && mkdir -p ../src/matyan_ui/static && GENERATE_SOURCEMAP=false react-app-rewired --max_old_space_size=4096 build && node tasks/gzip-build.js && node tasks/index-html-template-generator.js && cp -r './build/.' ../src/matyan_ui/static",
+    "build": "rm -rf ../src/matyan_ui/static && mkdir -p ../src/matyan_ui/static && GENERATE_SOURCEMAP=false react-app-rewired --max_old_space_size=16384 build && (node tasks/gzip-build.js & node tasks/index-html-template-generator.js & wait) && cp -r './build/.' ../src/matyan_ui/static",
     "test": "react-app-rewired test ",
     "test:coverage": "react-app-rewired test --collectCoverage",
     "test:watch": "react-app-rewired test --watchAll",
@@ -152,7 +152,7 @@
     "@typescript-eslint/parser": "^4.28.0",
     "comlink-loader": "^2.0.0",
     "copy-webpack-plugin": "^5.1.2",
-    "eslint": "^7.29.0",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-prettier": "^3.4.0",

@@ -169,8 +169,11 @@ class NetworkService {
           }
 
           if (response.status >= 400) {
-            return await this.checkCredentials(response, url, () =>
-              this.request(url, options),
+            return await this.checkCredentials(
+              response,
+              url,
+              () => this.request(url, options),
+              body,
             );
           }
 
@@ -370,10 +373,26 @@ class NetworkService {
     response: Response,
     endpoint: string,
     refetch: () => Promise<T>,
+    parsedBody?: unknown,
   ): Promise<T> {
+    const resolveOrRejectWithParsedBody = () => {
+      if (response.ok) {
+        return Promise.resolve(parsedBody as T);
+      }
+      const msg =
+        (parsedBody as { message?: string | null } | undefined)?.message ??
+        (response.statusText || 'Unknown error');
+      const error = new Error(msg) as Error & { status?: number };
+      error.status = response.status;
+      return Promise.reject(error);
+    };
+
     if (response.status === 401) {
       if (endpoint === `${ENDPOINTS.AUTH.BASE}/${ENDPOINTS.AUTH.REFRESH}`) {
         this.removeAuthToken();
+        if (parsedBody !== undefined) {
+          return resolveOrRejectWithParsedBody();
+        }
         return this.parseResponse<T>(response);
       }
       // Refresh token
@@ -382,6 +401,9 @@ class NetworkService {
         this.setAuthToken(token);
         return refetch();
       }
+    }
+    if (parsedBody !== undefined) {
+      return resolveOrRejectWithParsedBody();
     }
     return this.parseResponse<T>(response);
   }

@@ -143,6 +143,26 @@ function Controls(
             />
           </div>
         </Tooltip>
+        <Tooltip
+          title={
+            (props.listLayout ?? 'rows') === 'columns' ? 'Rows' : 'Columns'
+          }
+        >
+          <div
+            className={classNames('Controls__anchor', {
+              active: (props.listLayout ?? 'rows') === 'columns',
+              outlined: (props.listLayout ?? 'rows') === 'columns',
+            })}
+            onClick={props.onListLayoutToggle}
+          >
+            <Icon
+              className={classNames('Controls__icon', {
+                active: (props.listLayout ?? 'rows') === 'columns',
+              })}
+              name='group-column'
+            />
+          </div>
+        </Tooltip>
         <div>
           <ControlPopover
             title='Display in tooltip'

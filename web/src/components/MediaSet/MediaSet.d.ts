@@ -27,4 +27,5 @@ export interface IMediaSetProps {
   sortFields?: SortFields;
   selectOptions: IGroupingSelectOption[];
   onRunsTagsChange: (runHash: string, tags: ITagInfo[]) => void;
+  listLayout?: 'rows' | 'columns';
 }

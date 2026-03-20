@@ -3,6 +3,37 @@
 .MediaSet {
   width: 100%;
   background-color: #ffffff;
+
+  &__columns {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: max-content;
+    padding-left: 0.625rem;
+  }
+
+  &__column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: max-content;
+    padding-right: 0.625rem;
+    border-right: 1px solid $cuddle-70;
+
+    &:not(:last-child) {
+      margin-right: 0.625rem;
+    }
+  }
+
+  &--columns {
+    flex: 0 0 auto;
+    width: auto;
+
+    .MediaSet__container__mediaItemsList {
+      min-width: 0;
+    }
+  }
+
   &__connectorLine {
     position: absolute;
     top: -0.375rem;
@@ -132,13 +163,16 @@
     padding: toRem(1px);
   }
   .focus img {
-    box-shadow: 0 0 0 toRem(1.5px) $primary-color,
+    box-shadow:
+      0 0 0 toRem(1.5px) $primary-color,
       inset 0 0 0px toRem(0.5px) $primary-color;
   }
   .active {
     & img,
     & .skeletonContainer {
-      box-shadow: 0 0 0 toRem(1.5px) #b9d5f8, inset 0 0 0px toRem(0.5px) #b9d5f8;
+      box-shadow:
+        0 0 0 toRem(1.5px) #b9d5f8,
+        inset 0 0 0px toRem(0.5px) #b9d5f8;
     }
   }
   &__image {

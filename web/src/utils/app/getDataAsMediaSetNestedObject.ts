@@ -18,8 +18,7 @@ export function getDataAsMediaSetNestedObject<M extends State>({
   defaultGroupFields?: string[];
 }) {
   if (!_.isEmpty(data)) {
-    const modelState = model?.getState();
-    const configData = modelState?.config;
+    const configData = model?.getState()?.config;
     const grouping = configData?.grouping;
     const hiddenMetrics: string[] = configData?.table?.hiddenMetrics ?? [];
     const mediaSetData: object = {};

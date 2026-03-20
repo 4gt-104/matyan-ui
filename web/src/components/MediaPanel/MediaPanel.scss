@@ -37,9 +37,16 @@
     }
     &__mediaSetContainer {
       overflow-x: auto;
+      overflow-y: hidden;
+      min-height: 0;
       padding-left: 1.25rem;
       padding-top: 0.25rem;
       flex: 1;
+
+      &--columns {
+        padding-left: 0;
+        overflow-y: auto;
+      }
     }
     &__controls {
       border-left: 0.0625rem solid #dceafb;
