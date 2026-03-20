@@ -23,19 +23,29 @@ try {
 // Environment detection (you can keep this for development mode)
 const isDEVModeOn: boolean = process.env.NODE_ENV === 'development';
 
+function isJinjaPlaceholder(value: string | undefined): boolean {
+  return !value || value.startsWith('{{');
+}
+
 function getBasePath(isApiBasePath: boolean = true): string {
-  // if (globalScope.API_BASE_PATH === '{{ base_path }}') {
-  //   return isApiBasePath ? '' : '/';
-  // }
+  if (isJinjaPlaceholder(globalScope.API_BASE_PATH)) {
+    return isApiBasePath ? '' : '/';
+  }
   return `${globalScope.API_BASE_PATH}`;
 }
 
 // Injected by server template, fallback for local development
-const DEFAULT_API_HOST_BASE = 'http://localhost:53800';
-const API_HOST_BASE = globalScope.API_HOST_BASE ?? DEFAULT_API_HOST_BASE;
+const API_HOST_BASE = isJinjaPlaceholder(globalScope.API_HOST_BASE)
+  ? 'http://localhost:53800'
+  : globalScope.API_HOST_BASE!;
 
 // API path prefix injected by server (e.g. /api/v1), fallback for backward compat
-const API_BASE_PATH_SUFFIX = globalScope.API_BASE_PATH_SUFFIX ?? '/api/v1';
+const API_BASE_PATH_SUFFIX = isJinjaPlaceholder(
+  globalScope.API_BASE_PATH_SUFFIX,
+)
+  ? '/api/v1'
+  : globalScope.API_BASE_PATH_SUFFIX!;
+
 let API_HOST: string = `${API_HOST_BASE}${API_BASE_PATH_SUFFIX}/rest`;
 
 // Public API

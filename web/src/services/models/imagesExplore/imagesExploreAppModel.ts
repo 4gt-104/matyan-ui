@@ -245,6 +245,9 @@ function setDefaultAppConfigData(recoverTableState: boolean = true) {
     getStateFromUrl('images') ?? {};
 
   defaultConfig.images = images;
+  if (defaultConfig.images) {
+    defaultConfig.images.listLayout = defaultConfig.images.listLayout ?? 'rows';
+  }
 
   if (recoverTableState) {
     const tableConfigHash =
@@ -364,11 +367,18 @@ function getImagesData(
     | undefined;
   const recordDensity = configData?.images?.recordDensity;
   const indexDensity = configData?.images?.indexDensity;
+  const stepRange = configData?.images?.stepRange as number[] | undefined;
+  // stepRange=[0,0] is the uninitialized sentinel that appears in URLs saved
+  // before the first data response. Treat it as "no filter yet" so the backend
+  // returns the full step range and recordSlice can be properly initialized.
+  const isUninitializedRange =
+    !stepRange ||
+    (stepRange[0] === 0 && stepRange[1] === 0 && stepRange[0] === stepRange[1]);
   let query = getQueryStringFromSelect(configData!.select);
   let imageDataBody: any = {
     q: query !== '()' ? query : '',
   };
-  if (recordSlice) {
+  if (recordSlice && !isUninitializedRange) {
     //TODO check values nullability
     imageDataBody = {
       ...imageDataBody,
@@ -629,7 +639,41 @@ function setModelData(rawData: any[], configData: IImagesExploreAppConfig) {
     groupingSelectOptions,
     model,
   });
-  const ranges = rawData?.[0]?.ranges;
+  const ranges = rawData?.reduce((acc: any, run: any) => {
+    const r = run?.ranges;
+    if (!r) return acc;
+    if (!acc) return r;
+    return {
+      record_range_total: [
+        Math.min(acc.record_range_total[0], r.record_range_total[0]),
+        Math.max(acc.record_range_total[1], r.record_range_total[1]),
+      ],
+      record_range_used: [
+        Math.min(acc.record_range_used[0], r.record_range_used[0]),
+        Math.max(acc.record_range_used[1], r.record_range_used[1]),
+      ],
+      index_range_total: [
+        Math.min(
+          acc.index_range_total?.[0] ?? r.index_range_total?.[0] ?? 0,
+          r.index_range_total?.[0] ?? acc.index_range_total?.[0] ?? 0,
+        ),
+        Math.max(
+          acc.index_range_total?.[1] ?? r.index_range_total?.[1] ?? 0,
+          r.index_range_total?.[1] ?? acc.index_range_total?.[1] ?? 0,
+        ),
+      ],
+      index_range_used: [
+        Math.min(
+          acc.index_range_used?.[0] ?? r.index_range_used?.[0] ?? 0,
+          r.index_range_used?.[0] ?? acc.index_range_used?.[0] ?? 0,
+        ),
+        Math.max(
+          acc.index_range_used?.[1] ?? r.index_range_used?.[1] ?? 0,
+          r.index_range_used?.[1] ?? acc.index_range_used?.[1] ?? 0,
+        ),
+      ],
+    };
+  }, null);
   const tableData = getDataAsTableRows(
     data,
     params,
@@ -2333,6 +2377,22 @@ function onStackingToggle(): void {
   }
 }
 
+function onListLayoutToggle(): void {
+  const configData: IImagesExploreAppConfig | undefined =
+    model.getState()?.config;
+  if (configData?.images) {
+    const current = configData.images.listLayout ?? 'rows';
+    const next = current === 'rows' ? 'columns' : 'rows';
+    const images = {
+      ...configData.images,
+      listLayout: next,
+    };
+    const config = { ...configData, images };
+    updateURL(config as IImagesExploreAppConfig);
+    model.setState({ config });
+  }
+}
+
 const imagesExploreAppModel = {
   ...model,
   initialize,
@@ -2381,6 +2441,7 @@ const imagesExploreAppModel = {
   showRangePanel,
   getDataAsImageSet,
   onStackingToggle,
+  onListLayoutToggle,
   onImagesSortChange,
   onImagesSortReset,
   deleteRuns,

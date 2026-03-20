@@ -14,6 +14,7 @@ import DepthDropdown from 'components/DepthDropdown/DepthDropdown';
 import DepthSlider from 'components/DepthSlider/DepthSlider';
 
 import {
+  ITEM_CAPTION_HEIGHT,
   MEDIA_ITEMS_SIZES,
   MEDIA_SET_SIZE,
   MEDIA_SET_SLIDER_HEIGHT,
@@ -21,11 +22,10 @@ import {
   MEDIA_SET_WRAPPER_PADDING_HEIGHT,
 } from 'config/mediaConfigs/mediaConfigs';
 
-import { formatValue } from 'utils/formatValue';
 import { jsonParse } from 'utils/jsonParse';
-import { SortField } from 'utils/getSortedFields';
 import getBiggestImageFromList from 'utils/getBiggestImageFromList';
 
+import { buildMediaSetContent } from './mediaSetContentUtils';
 import { IMediaSetProps } from './MediaSet.d';
 
 import './MediaSet.scss';
@@ -48,85 +48,27 @@ const MediaSet = ({
   sortFields,
   selectOptions,
   onRunsTagsChange,
+  listLayout = 'rows',
 }: IMediaSetProps): React.FunctionComponentElement<React.ReactNode> => {
   const [depthMap, setDepthMap] = React.useState<number[]>([]);
-  let content: [(string | {})[], [] | [][]][] = []; // the actual items list to be passed to virtualized list component
-  let keysMap: { [key: string]: number } = {}; // cache for checking whether the group title is already added to list
 
-  fillContent(data, [''], orderedMap);
-
-  function setStackedList(list: [], stackedList: [][]): void {
-    for (let j = 0; j < list.length; j++) {
-      if (!stackedList[j]) {
-        stackedList[j] = [];
-      }
-      stackedList[j].push(list[j]);
-    }
-  }
-
-  function setStackedContent(list: [], path: (string | {})[]): void {
-    const [lastContentPath, lastContentList] = content[content.length - 1];
-    const [orderedMapKey, value] = (path[path.length - 1] as string).split(
-      ' = ',
-    );
-    if (path.length === lastContentPath.length) {
-      (lastContentPath[lastContentPath.length - 1] as any)[orderedMapKey].push(
-        value,
-      );
-      setStackedList(list, lastContentList);
-    } else {
-      let stackedList: [][] = [];
-      setStackedList(list, stackedList);
-      path[path.length - 1] = { [orderedMapKey]: [value] };
-      content.push([path, stackedList]);
-    }
-  }
-
-  function getOrderedContentList(list: []): [] {
-    const listKeys: string[] = [];
-    const listOrderTypes: any[] = [];
-    sortFields?.forEach((sortField: SortField) => {
-      listKeys.push(sortField.value);
-      listOrderTypes.push(sortField.order);
-    });
-    return _.orderBy(list, listKeys, listOrderTypes) as [];
-  }
-
-  function fillContent(
-    list: [] | { [key: string]: [] | {} },
-    path: (string | {})[] = [''],
-    orderedMap: { [key: string]: any },
-  ) {
-    if (Array.isArray(list)) {
-      const orderedContentList = getOrderedContentList(list);
-      if (additionalProperties.stacking && content.length) {
-        setStackedContent(orderedContentList, path);
-      } else {
-        content.push([path, orderedContentList]);
-      }
-    } else {
-      const fieldSortedValues = _.orderBy(
-        [...(orderedMap?.ordering || [])].reduce((acc: any, value: any) => {
-          acc.push({ [orderedMap.key]: value });
-          return acc;
-        }, []),
-        [orderedMap?.key || ''],
-        [sortFieldsDict?.[orderedMap?.orderKey]?.order || 'asc'],
-      ).map((value: any) => value[orderedMap?.key]);
-      fieldSortedValues.forEach((val: any) => {
-        const fieldName = `${orderedMap.key} = ${formatValue(val)}`;
-        if (!keysMap.hasOwnProperty(path.join(''))) {
-          content.push([path, []]);
-          keysMap[path.join('')] = 1;
-        }
-        fillContent(
-          list[fieldName],
-          path.concat([fieldName]),
-          orderedMap[fieldName],
-        );
-      });
-    }
-  }
+  const content = React.useMemo(
+    () =>
+      buildMediaSetContent(
+        data,
+        orderedMap,
+        additionalProperties.stacking,
+        sortFieldsDict,
+        sortFields,
+      ),
+    [
+      data,
+      orderedMap,
+      additionalProperties.stacking,
+      sortFieldsDict,
+      sortFields,
+    ],
+  );
 
   function getItemSize(index: number): number {
     let [path, items] = content[index];
@@ -171,6 +113,16 @@ const MediaSet = ({
     [depthMap, setDepthMap],
   );
 
+  const isColumns = listLayout === 'columns';
+
+  // In columns mode images are stacked vertically and often appear too small.
+  // Scale the effective height up so that column widths (derived from aspect
+  // ratio × height) are more comfortable to read.
+  const COLUMNS_HEIGHT_SCALE = 1.5;
+  const effectiveWrapperOffsetHeight = isColumns
+    ? wrapperOffsetHeight * COLUMNS_HEIGHT_SCALE
+    : wrapperOffsetHeight;
+
   const mediaItemHeight = React.useMemo(() => {
     if (mediaType === MediaTypeEnum.AUDIO) {
       return MEDIA_ITEMS_SIZES[mediaType]()?.height;
@@ -179,14 +131,14 @@ const MediaSet = ({
         data,
         additionalProperties,
         wrapperOffsetWidth,
-        wrapperOffsetHeight,
+        wrapperOffsetHeight: effectiveWrapperOffsetHeight,
       })?.height;
     }
   }, [
     additionalProperties,
     data,
     mediaType,
-    wrapperOffsetHeight,
+    effectiveWrapperOffsetHeight,
     wrapperOffsetWidth,
   ]);
 
@@ -196,32 +148,91 @@ const MediaSet = ({
     }
   }, [additionalProperties.stacking, data, content.length]);
 
+  const itemData = React.useMemo(
+    () => ({
+      data: content,
+      addUriToList,
+      wrapperOffsetWidth,
+      wrapperOffsetHeight: effectiveWrapperOffsetHeight,
+      index,
+      mediaSetKey,
+      mediaItemHeight,
+      focusedState,
+      additionalProperties,
+      tooltip,
+      mediaType,
+      depthMap,
+      onDepthChange,
+      selectOptions,
+      onRunsTagsChange,
+      listLayout,
+    }),
+    [
+      content,
+      addUriToList,
+      wrapperOffsetWidth,
+      wrapperOffsetHeight,
+      index,
+      mediaSetKey,
+      mediaItemHeight,
+      focusedState,
+      additionalProperties,
+      tooltip,
+      mediaType,
+      depthMap,
+      onDepthChange,
+      selectOptions,
+      onRunsTagsChange,
+      listLayout,
+    ],
+  );
+
+  if (isColumns) {
+    // Group content items into visual columns. A path.length=2 item starts a
+    // new column; all deeper items (path.length>=3) belong to the most-recently
+    // opened column. This ensures that multi-level grouping produces nested
+    // headers inside one column instead of separate empty "padding" columns.
+    const columnGroups: number[][] = [];
+    content.forEach(([path], originalIndex) => {
+      if (path.length < 2) return; // skip separators
+      if (path.length === 2) {
+        columnGroups.push([originalIndex]);
+      } else {
+        if (columnGroups.length === 0) columnGroups.push([]);
+        columnGroups[columnGroups.length - 1].push(originalIndex);
+      }
+    });
+
+    return (
+      <ErrorBoundary>
+        <div className='MediaSet__columns'>
+          {columnGroups.map((groupIndices, groupIdx) => (
+            <div key={groupIdx} className='MediaSet__column'>
+              {groupIndices.map((originalIndex) => (
+                <MediaGroupedList
+                  key={originalIndex}
+                  index={originalIndex}
+                  style={{}}
+                  data={itemData}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </ErrorBoundary>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <List
-        key={content.length + tableHeight + mediaSetKey}
+        key={`${content.length}-${tableHeight}-${mediaSetKey}`}
         height={wrapperOffsetHeight || 0}
         itemCount={content.length}
         itemSize={getItemSize}
-        width={'100%'}
+        width='100%'
         onScroll={onListScroll}
-        itemData={{
-          data: content,
-          addUriToList,
-          wrapperOffsetWidth,
-          wrapperOffsetHeight,
-          index,
-          mediaSetKey,
-          mediaItemHeight,
-          focusedState,
-          additionalProperties,
-          tooltip,
-          mediaType,
-          depthMap,
-          onDepthChange,
-          selectOptions,
-          onRunsTagsChange,
-        }}
+        itemData={itemData}
       >
         {MediaGroupedList}
       </List>
@@ -239,7 +250,8 @@ function propsComparator(
     prevProps.wrapperOffsetHeight !== nextProps.wrapperOffsetHeight ||
     prevProps.wrapperOffsetWidth !== nextProps.wrapperOffsetWidth ||
     prevProps.focusedState !== nextProps.focusedState ||
-    prevProps.sortFieldsDict !== nextProps.sortFieldsDict
+    prevProps.sortFieldsDict !== nextProps.sortFieldsDict ||
+    prevProps.listLayout !== nextProps.listLayout
   ) {
     return false;
   }
@@ -276,23 +288,58 @@ const MediaGroupedList = React.memo(function MediaGroupedList({
   const isJson: boolean = typeof json === 'object';
   const renderStacking =
     currentItems.length > 0 && isStackedPath && pathValue.length > 1;
+  const isColumns = (data.listLayout ?? 'rows') === 'columns';
+
+  // Compute the column width from the actual rendered image widths so images
+  // are the same size as in rows mode (no stretching).
+  const naturalColumnWidth = React.useMemo(() => {
+    if (!isColumns || currentItems.length === 0) return undefined;
+    const maxW = Math.max(
+      ...currentItems.map((_: any, i: number) => {
+        const sizeFn = (MEDIA_ITEMS_SIZES as any)[data.mediaType]; // noqa: ANN401
+        const size = sizeFn?.({
+          data: currentItems,
+          index: i,
+          additionalProperties: data.additionalProperties,
+          wrapperOffsetWidth: data.wrapperOffsetWidth,
+          wrapperOffsetHeight: data.wrapperOffsetHeight,
+        });
+        return size?.width ?? 60;
+      }),
+    );
+    return Math.max(maxW, 60);
+  }, [
+    isColumns,
+    currentItems,
+    data.mediaType,
+    data.additionalProperties,
+    data.wrapperOffsetWidth,
+    data.wrapperOffsetHeight,
+  ]);
+
+  const mergedStyle: React.CSSProperties = isColumns
+    ? currentItems.length > 0
+      ? { width: naturalColumnWidth }
+      : {} // header-only item: let the parent column div determine width
+    : {
+        paddingLeft: `calc(0.625rem * ${path.length - 2})`,
+        ...style,
+      };
   return (
     <ErrorBoundary>
       <div
-        className='MediaSet'
-        style={{
-          paddingLeft: `calc(0.625rem * ${path.length - 2})`,
-          ...style,
-        }}
+        className={classNames('MediaSet', { 'MediaSet--columns': isColumns })}
+        style={mergedStyle}
       >
-        {path.slice(2).map((key: string, i: number) => (
-          <ErrorBoundary key={key}>
-            <div
-              className='MediaSet__connectorLine'
-              style={{ left: `calc(0.625rem * ${i})` }}
-            />
-          </ErrorBoundary>
-        ))}
+        {!isColumns &&
+          path.slice(2).map((key: string, i: number) => (
+            <ErrorBoundary key={key}>
+              <div
+                className='MediaSet__connectorLine'
+                style={{ left: `calc(0.625rem * ${i})` }}
+              />
+            </ErrorBoundary>
+          ))}
         <div
           className={`MediaSet__container ${path.length > 2 ? 'withDash' : ''}`}
         >
@@ -371,7 +418,7 @@ const MediaGroupedList = React.memo(function MediaGroupedList({
           {currentItems.length > 0 && (
             <div className='MediaSet__container__mediaItemsList'>
               <MediaList
-                key={`${index}-${depth}`}
+                key={`${index}-${depth}-${data.listLayout ?? 'rows'}`}
                 data={currentItems}
                 addUriToList={data.addUriToList}
                 wrapperOffsetWidth={data.wrapperOffsetWidth}
@@ -383,6 +430,15 @@ const MediaGroupedList = React.memo(function MediaGroupedList({
                 mediaType={data.mediaType}
                 selectOptions={data.selectOptions}
                 onRunsTagsChange={data.onRunsTagsChange}
+                listLayout={isColumns ? 'vertical' : 'horizontal'}
+                columnWidth={isColumns ? naturalColumnWidth : undefined}
+                listHeightOverride={
+                  isColumns
+                    ? currentItems.length *
+                        (data.mediaItemHeight + ITEM_CAPTION_HEIGHT) +
+                      1
+                    : undefined
+                }
               />
             </div>
           )}

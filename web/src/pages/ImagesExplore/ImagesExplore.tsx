@@ -96,13 +96,18 @@ function ImagesExplore(): React.FunctionComponentElement<React.ReactNode> {
     }
     const grouping = imagesExploreData?.config?.grouping;
     const group: string[] = [...(grouping?.row || [])];
-    const groupFields = grouping?.reverseMode?.row
-      ? imagesExploreData?.groupingSelectOptions.filter(
-          (option: IGroupingSelectOption) => !group.includes(option.value),
-        )
-      : imagesExploreData?.groupingSelectOptions.filter(
-          (option: IGroupingSelectOption) => group.includes(option.value),
-        );
+    const groupFields = (
+      grouping?.reverseMode?.row
+        ? imagesExploreData?.groupingSelectOptions.filter(
+            (option: IGroupingSelectOption) => !group.includes(option.value),
+          )
+        : imagesExploreData?.groupingSelectOptions.filter(
+            (option: IGroupingSelectOption) => group.includes(option.value),
+          )
+    ).sort(
+      (a: IGroupingSelectOption, b: IGroupingSelectOption) =>
+        group.indexOf(a.value) - group.indexOf(b.value),
+    );
     let sortGroupFields = groupFields.reduce(
       (acc: SortFields, field: SortField) => {
         const resultField = imagesExploreData?.config?.images?.sortFieldsDict[
@@ -337,6 +342,9 @@ function ImagesExplore(): React.FunctionComponentElement<React.ReactNode> {
                     additionalProperties={
                       imagesExploreData?.config?.images?.additionalProperties
                     }
+                    listLayout={
+                      imagesExploreData?.config?.images?.listLayout ?? 'rows'
+                    }
                     illustrationConfig={{
                       page: 'image',
                       type: imagesExploreData?.selectFormData?.options?.length
@@ -376,6 +384,13 @@ function ImagesExplore(): React.FunctionComponentElement<React.ReactNode> {
                         }
                         onStackingToggle={
                           imagesExploreAppModel.onStackingToggle
+                        }
+                        listLayout={
+                          imagesExploreData?.config?.images?.listLayout ??
+                          'rows'
+                        }
+                        onListLayoutToggle={
+                          imagesExploreAppModel.onListLayoutToggle
                         }
                         onImagesSortChange={
                           imagesExploreAppModel.onImagesSortChange

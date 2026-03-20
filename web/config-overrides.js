@@ -1,4 +1,5 @@
 const path = require('path'); // For resolving file paths
+const os = require('os');
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const WebpackDynamicPublicPathPlugin = require('webpack-dynamic-public-path');
@@ -8,7 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   webpack: function (config, webpackEnv) {
-    const isEnvProduction = true; // Force production mode
+    const isEnvProduction = webpackEnv === 'production';
 
     // 1. Set build output directory to Python package's static folder
     // if (isEnvProduction) {
@@ -36,8 +37,9 @@ module.exports = {
         (m) => m.constructor.name === 'TerserPlugin'
       );
       if (terserIndex !== -1) {
+        const maxWorkers = Math.max(2, os.cpus().length - 1);
         config.optimization.minimizer[terserIndex] = new TerserPlugin({
-          parallel: true,
+          parallel: maxWorkers,
           cache: true,
           terserOptions: {
             parse: { ecma: 8 },
