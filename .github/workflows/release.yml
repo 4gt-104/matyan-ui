@@ -39,12 +39,24 @@ jobs:
           # setuptools-scm derives the version from git tags; full history is required
           fetch-depth: 0
 
+      - name: Set version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: web/package-lock.json
+
+      - name: Set package.json version from tag
+        working-directory: web
+        run: npm version ${{ steps.version.outputs.version }} --no-git-tag-version
 
       - name: Install web dependencies
         working-directory: web
