@@ -39,7 +39,7 @@ const ENDPOINTS = {
     DELETE: '',
   },
   RELEASE_NOTES: {
-    BASE: 'https://api.github.com/repos/matyan-core/matyan-core/releases',
+    BASE: 'https://api.github.com/repos/4gt-104/matyan-core/releases',
     GET: '',
     GET_BY_TAG_NAME: 'tags',
   },

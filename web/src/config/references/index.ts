@@ -1,8 +1,8 @@
-const MATYAN_DOCS_BASE = 'https://4gt-104.github.io/matyan-core';
+const MATYAN_DOCS_BASE = 'https://4gt-104.github.io/matyan-core/stable';
 const MATYAN_REPO = 'https://github.com/4gt-104/matyan-core';
 
 const DOCUMENTATIONS = {
-  MAIN_PAGE: MATYAN_REPO,
+  MAIN_PAGE: `${MATYAN_DOCS_BASE}/`,
   STABLE: `${MATYAN_DOCS_BASE}/`,
   MATYAN_QL: `${MATYAN_DOCS_BASE}/using/search/`,
   SUPPORTED_TYPES: `${MATYAN_DOCS_BASE}/quick-start/supported-types/`,
@@ -50,8 +50,7 @@ const DEMOS = {
 
 const GUIDES = {
   SETUP: {
-    COLAB_EXAMPLE:
-      'https://colab.research.google.com/drive/14rIAjpEyklf5fSMiRbyZs6iYG7IVibcI?usp=sharing',
+    COLAB_EXAMPLE: `${MATYAN_DOCS_BASE}/getting-started/`,
   },
 };
 
@@ -93,4 +92,4 @@ const DASHBOARD_PAGE_GUIDES: { name: string; url: string }[] = [
   { name: 'Concepts', url: `${MATYAN_DOCS_BASE}/understanding/concepts/` },
 ];
 
-export { DOCUMENTATIONS, GUIDES, DEMOS, DASHBOARD_PAGE_GUIDES };
+export { DOCUMENTATIONS, GUIDES, DEMOS, DASHBOARD_PAGE_GUIDES, MATYAN_REPO };

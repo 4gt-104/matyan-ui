@@ -1,6 +1,8 @@
 import * as React from 'react';
 import _ from 'lodash-es';
 
+import { DOCUMENTATIONS } from 'config/references';
+
 import { ControlsConfigs } from 'modules/core/engine/visualizations/controls';
 import { GroupingConfigs } from 'modules/core/engine/explorer/groupings';
 import { GroupType } from 'modules/core/pipeline';
@@ -125,8 +127,7 @@ export const defaultHydration = {
   QueryForm: AdvancedQueryForm,
   Controls: Controls,
   Groupings: Grouping,
-  documentationLink:
-    'https://matyan.readthedocs.io/en/latest/ui/pages/explorers.html',
+  documentationLink: DOCUMENTATIONS.EXPLORERS.SEARCH,
   box: {
     persist: true,
     initialState: {

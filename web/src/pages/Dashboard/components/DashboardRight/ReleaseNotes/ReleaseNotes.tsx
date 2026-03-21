@@ -12,14 +12,8 @@ import useReleaseNotes from './useReleaseNotes';
 import './ReleaseNotes.scss';
 
 function ReleaseNotes(): React.FunctionComponentElement<React.ReactNode> {
-  const {
-    changelogData,
-    LatestReleaseData,
-    currentReleaseData,
-    isLoading,
-    releaseNoteRef,
-    scrollShadow,
-  } = useReleaseNotes();
+  const { changelogData, LatestReleaseData, isLoading, releaseNoteRef } =
+    useReleaseNotes();
 
   return (
     <div className='ReleaseNotes'>
@@ -78,21 +72,6 @@ function ReleaseNotes(): React.FunctionComponentElement<React.ReactNode> {
                   />
                 ))}
               </div>
-              {currentReleaseData ? (
-                <div
-                  className={`ReleaseNotes__changelog__currentRelease ${
-                    scrollShadow
-                      ? 'ReleaseNotes__changelog__currentRelease__scroll'
-                      : ''
-                  }`}
-                >
-                  <ReleaseNoteItem
-                    tagName={`${currentReleaseData!.tagName} [current]`}
-                    info={currentReleaseData!.info}
-                    href={currentReleaseData!.url}
-                  />
-                </div>
-              ) : null}
             </div>
           )}
           <GuideLinks />
