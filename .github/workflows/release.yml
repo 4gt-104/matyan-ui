@@ -75,6 +75,8 @@ jobs:
           enable-cache: true
 
       - name: Build wheel and sdist
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION: ${{ steps.version.outputs.version }}
         run: uv build
 
       - name: Upload distributions as artifact
