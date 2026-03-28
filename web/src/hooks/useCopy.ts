@@ -9,10 +9,13 @@ export function useCopy(
 ) {
   const [copied, setCopied] = React.useState(false);
   const onCopy = React.useCallback(() => {
-    const text: string =
+    let text: string =
       typeof contentRef === 'string'
         ? contentRef
-        : contentRef?.current?.innerText?.trim('');
+        : contentRef?.current?.innerText || '';
+
+    text = text.replace(/\u00A0/g, ' ').trim();
+
     onCopyToClipBoard(text, copied);
     setCopied(true);
   }, [contentRef, copied]);

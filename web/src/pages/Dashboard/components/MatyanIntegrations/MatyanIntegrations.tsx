@@ -26,7 +26,7 @@ function MatyanIntegrations() {
     {
       title: 'Integrate PyTorch Lightning',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.PYTORCH_LIGHTNING,
-      code: `from matyan.pytorch_lightning import MatyanLogger
+      code: `from matyan_client.adapters.pytorch_lightning import MatyanLogger
 
 # ...
 trainer = pl.Trainer(logger=MatyanLogger(experiment='experiment_name'))
@@ -35,7 +35,7 @@ trainer = pl.Trainer(logger=MatyanLogger(experiment='experiment_name'))
     {
       title: 'Integrate Hugging Face',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.HUGGING_FACE,
-      code: `from matyan.hugging_face import MatyanCallback
+      code: `from matyan_client.adapters.hugging_face import MatyanCallback
 
 # ...
 matyan_callback = MatyanCallback(repo='/path/to/logs/dir', experiment='mnli')
@@ -52,21 +52,22 @@ trainer = Trainer(
     {
       title: 'Integrate Keras & tf.keras',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS,
-      code: `import matyan
+      code: `from matyan_client.adapters.keras import MatyanCallback as KerasMatyanCallback
+from matyan_client.adapters.tensorflow import MatyanCallback as TensorflowMatyanCallback
 
 # ...
 model.fit(x_train, y_train, epochs=epochs, callbacks=[
-    matyan.keras.MatyanCallback(repo='/path/to/logs/dir', experiment='experiment_name')
+    KerasMatyanCallback(repo='/path/to/logs/dir', experiment='experiment_name'),
     
     # Use matyan.tensorflow.MatyanCallback in case of tf.keras
-    matyan.tensorflow.MatyanCallback(repo='/path/to/logs/dir', experiment='experiment_name')
+    TensorflowMatyanCallback(repo='/path/to/logs/dir', experiment='experiment_name')
 ])
 # ...`,
     },
     {
       title: 'Integrate KerasTuner',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS_TUNER,
-      code: `from matyan.keras_tuner import MatyanCallback
+      code: `from matyan_client.adapters.keras_tuner import MatyanCallback
 
 # ...
 tuner.search(
@@ -79,7 +80,7 @@ tuner.search(
     {
       title: 'Integrate XGBoost',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.XGBOOST,
-      code: `from matyan.xgboost import MatyanCallback
+      code: `from matyan_client.adapters.xgboost import MatyanCallback
 
 # ...
 matyan_callback = MatyanCallback(repo='/path/to/logs/dir', experiment='experiment_name')
@@ -89,7 +90,7 @@ bst = xgb.train(param, xg_train, num_round, watchlist, callbacks=[matyan_callbac
     {
       title: 'Integrate CatBoost',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.CATBOOST,
-      code: `from matyan.catboost import MatyanLogger
+      code: `from matyan_client.adapters.catboost import MatyanLogger
 
 # ...
 model.fit(train_data, train_labels, log_cout=MatyanLogger(loss_function='Logloss'), logging_level="Info")
@@ -98,7 +99,7 @@ model.fit(train_data, train_labels, log_cout=MatyanLogger(loss_function='Logloss
     {
       title: 'Integrate fastai',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.FASTAI,
-      code: `from matyan.fastai import MatyanCallback
+      code: `from matyan_client.adapters.fastai import MatyanCallback
 
 # ...
 learn = cnn_learner(dls, resnet18, pretrained=True,
@@ -110,7 +111,7 @@ learn = cnn_learner(dls, resnet18, pretrained=True,
     {
       title: 'Integrate LightGBM',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.LIGHT_GBM,
-      code: `from matyan.lightgbm import MatyanCallback
+      code: `from matyan_client.adapters.lightgbm import MatyanCallback
 
 # ...
 matyan_callback = MatyanCallback(experiment='lgb_test')
@@ -127,7 +128,7 @@ gbm = lgb.train(params,
     {
       title: 'Integrate PyTorch Ignite',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.PYTORCH_IGNITE,
-      code: `from matyan.pytorch_ignite import MatyanLogger
+      code: `from matyan_client.adapters.pytorch_ignite import MatyanLogger
 
 # ...
 matyan_logger = MatyanLogger()

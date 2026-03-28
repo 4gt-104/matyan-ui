@@ -31,7 +31,7 @@ function QuickStart() {
           Integrate Matyan with your code
         </Text>
         <CodeBlock
-          code={`from matyan import Run
+          code={`from matyan_client import Run
 
 # Initialize a new run
 run = Run()
@@ -45,7 +45,9 @@ run["hparams"] = {
 # Log metrics
 for i in range(10):
     run.track(i, name='loss', step=i, context={ "subset":"train" })
-    run.track(i, name='acc', step=i, context={ "subset":"train" })`}
+    run.track(i, name='acc', step=i, context={ "subset":"train" })
+  
+run.close()`}
         />
         <Text
           component='p'
