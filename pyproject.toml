@@ -46,4 +46,20 @@ fallback_version = "0.2.0"
 "matyan_ui" = ["static/**/*"] # Include static files in the package
 
 [dependency-groups]
-dev = ["mypy~=1.15"]
+dev = []
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-aarch64", "linux-64", "osx-arm64"]
+
+[tool.pixi.pypi-dependencies]
+matyan-ui = { path = ".", editable = true }
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+dev = { features = ["dev"], solve-group = "default" }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+python = "~=3.12.0"

@@ -1,6 +1,5 @@
 # Stage 1: build web UI (produces matyan-ui/src/matyan_ui/static/ including index-template.html)
 # Pin to host platform so npm build runs natively; static assets are platform-agnostic.
-# syntax=docker/dockerfile:1 (optional; enables BuildKit cache mount)
 FROM --platform=$BUILDPLATFORM node:20-slim AS web-builder
 WORKDIR /app
 RUN mkdir -p matyan-ui/src/matyan_ui
@@ -20,7 +19,7 @@ ENV GENERATE_SOURCEMAP=false
 RUN cd matyan-ui/web && npm run build
 
 # Stage 2: Python runtime with pre-built static files
-FROM python:3.12-slim AS base
+FROM debian:bookworm-20260316-slim AS base
 
 ARG IMAGE_VERSION=dev
 LABEL org.opencontainers.image.title="matyan-ui"
@@ -30,15 +29,27 @@ LABEL org.opencontainers.image.source="https://github.com/4gt-104/matyan-core"
 LABEL org.opencontainers.image.documentation="https://4gt-104.github.io/matyan-core/"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 
-COPY --from=ghcr.io/astral-sh/uv:0.10.3@sha256:7a88d4c4e6f44200575000638453a5a381db0ae31ad5c3a51b14f8687c9d93a3 /uv /uvx /bin/
+ARG PIXI_VERSION=v0.66.0
+ENV PATH="/root/.pixi/bin:${PATH}"
 
-WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    wget \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL https://pixi.sh/install.sh | PIXI_VERSION=${PIXI_VERSION} bash
 
-COPY matyan-ui/pyproject.toml /app/matyan-ui/
-RUN cd /app/matyan-ui && uv pip install --system --no-cache -r pyproject.toml
+WORKDIR /app/matyan-ui
 
-COPY matyan-ui/src/ /app/matyan-ui/src/
-COPY --from=web-builder /app/matyan-ui/src/matyan_ui/static /app/matyan-ui/src/matyan_ui/static
-RUN uv pip install --system --no-cache --no-deps /app/matyan-ui/
+COPY matyan-ui/pyproject.toml matyan-ui/pixi.lock ./
+
+RUN pixi install -e dev --frozen --skip matyan-ui
+
+COPY matyan-ui/src/ ./src/
+COPY --from=web-builder /app/matyan-ui/src/matyan_ui/static ./src/matyan_ui/static
+
+RUN pixi install -e dev --frozen
+
+ENV PATH="/app/matyan-ui/.pixi/envs/dev/bin:${PATH}"
 
 CMD ["matyan-ui"]
